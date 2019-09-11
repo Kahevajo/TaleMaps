@@ -27,11 +27,31 @@ async function parseLog(luaFile) {
         }
     }
 
-    for(var entry of logEntries) {
+    for(let entry of logEntries) {
         logs.logData.push(entry.split(",").map(s => s.trim()))
     }
-    for (var version of versionEntries) {
+    for (let version of versionEntries) {
         logs.versions.push(version.split(",").map(s => s.trim()))
+    }
+
+    if(logs.versions.length === 0) {
+        for(var i of logs.logData) {
+            i.unshift("1.0.1")
+        }
+    } else {
+        let nextStart = null
+        let currentLog = 0
+        for(let i = 0; i < logs.versions.length; i++) {
+            if(!logs.versions[i+1]) {
+                nextStart = logs.logData.length
+            } else {
+                nextStart = logs.versions[i+1][1]-1
+            }
+            while(currentLog < nextStart) {
+                logs.logData[currentLog].unshift(logs.versions[i][0])
+                currentLog++
+            }
+        }
     }
 
     if(logs.logData.length === 0) {

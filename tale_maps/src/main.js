@@ -13,10 +13,21 @@ import "@/assets/global.css"
 
 import parseLog from "./utility/parseLogs"
 
-const Landing= () => import('./views/Landing.vue')
+import {ids, IDSTRINGS, mapIDs} from "./utility/mappings.js"
+
+const Landing = () => import('./views/Landing.vue')
+const VideoGenerator = () => import('./views/VideoGenerator');
+const ZoneImageGenerator = () => import('./views/ZoneImageGenerator');
+const CanvasDrawer = () => import('./components/CanvasDrawer');
+
+
 
 const routes = [
   { path: '/', component: Landing},
+  { path: '/video', component: VideoGenerator},
+  { path: '/zones', component: ZoneImageGenerator },
+  { path: '/zoneCanvas', component: CanvasDrawer },
+
 ]
 
 const router = new VueRouter({
@@ -28,6 +39,7 @@ const store = new Vuex.Store({
     logs: null,
     file: null,
     error: null,
+    zoneMode: null
   },
   mutations: {
     addLog(state, payload) {
