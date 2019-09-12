@@ -1,7 +1,14 @@
 <template>
   <div>
     <h2 id="zoneTitle">Zone Image Generator (Progress: {{renderIndex}} of {{$store.state.logs.logData.length}} frames)</h2>
-    <canvas id="zoneCanvas" width="1002" height="668"></canvas>
+    <div id="canvasContainer">
+      <canvas id="zoneCanvas" width="1002" height="668"></canvas>
+      <div id="controlContainer">
+        <button id="stopButton" v-on:click="pause = true">Pause</button>
+        <button id="playButton" v-on:click="renderLoop()">Play</button>
+        <button id="abortButton" v-on:click="abortRendering()">Abort</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,6 +27,7 @@ export default {
       canvas: null,
       loading: true,
       renderIndex: 0,
+      pause: false,
     }
   },
   mounted() {
@@ -36,7 +44,11 @@ export default {
   methods: {
     async renderLoop() {
       let logs = this.$store.state.logs.logData
-      for(let i = 0; i<logs.length; i++) {
+      for(let i = this.renderIndex; i<logs.length; i++) {
+        if(this.pause) {
+          this.pause = false;
+          break
+        }
         this.renderIndex = i;
         if(logs[i][3] === "-1") continue;
         this.loading = true
@@ -95,12 +107,24 @@ export default {
     },
     drawPoint(context, x, y) {
       context.fillRect(x*1002, y*668, 5, 5)
+    },
+    abortRendering() {
+      this.pause = true
+      this.tempMaps = {}
+      this.renderIndex = 0
+      this.$store.state.zoneMode = null
+      this.$router.push("/");
     }
   }
 }
 </script>
 
 <style>
+#canvasContainer {
+  display: flex;
+  flex-direction: row;
+}
+
 #zoneCanvas {
   border: 1px solid white;
   margin: 0 auto;
