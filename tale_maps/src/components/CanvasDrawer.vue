@@ -40,6 +40,7 @@ export default {
       loading: true,
       renderIndex: 0,
       pause: false,
+      prevPoint: {},
     }
   },
   mounted() {
@@ -89,7 +90,7 @@ export default {
         return new Promise((resolve, reject) => {
           img.onload = () => {
             this.context.drawImage(img, 0, 0);
-            this.drawPoint(this.context, log.x, log.y)
+            this.draw(this.context, log.x, log.y, log.map)
             this.loading = false;
             this.tempMaps[log.map] = this.canvas.toDataURL("image/jpeg", 1.0)
             resolve()
@@ -105,7 +106,7 @@ export default {
         return new Promise((resolve, reject) => {
           img.onload = () => {
             this.context.drawImage(img, 0, 0);
-            this.drawPoint(this.context, log.x, log.y)
+            this.draw(this.context, log.x, log.y, log.map)
             this.loading = false;
             this.tempMaps[log.map] = this.canvas.toDataURL("image/jpeg", 1.0)
             resolve()
@@ -117,12 +118,33 @@ export default {
         })
       }
     },
-    drawPoint(context, x, y) {
-      context.fillRect(x*1002, y*668, 5, 5)
+    draw(context, x, y, map) {
+      if(this.$store.state.zoneMode === "points") {
+        context.fillRect(x*1002, y*668, 2, 2)
+      } else if(this.$store.state.zoneMode === "lines") {
+        if(!this.prevPoint[map]) {
+          this.prevPoint[map] = [x, y]
+          return
+        }
+        const dist = Math.sqrt((x*1002 - this.prevPoint[map][0]*1002) ** 2 + (y*668 - this.prevPoint[map][1]*668) ** 2);
+        if(dist < 1) {
+          return
+        } else {
+          context.beginPath()
+          context.lineWidth = "2"
+          context.moveTo(this.prevPoint[map][0]*1002, this.prevPoint[map][1]*668)
+          context.lineTo(x*1002, y*668)
+          context.closePath
+          context.stroke()
+
+          this.prevPoint[map] = [x, y]
+        }
+      }
     },
     abortRendering() {
       this.pause = true
       this.tempMaps = {}
+      this.prevPoint = []
       this.renderIndex = 0
       this.$store.state.zoneMode = null
       this.$router.push("/");
