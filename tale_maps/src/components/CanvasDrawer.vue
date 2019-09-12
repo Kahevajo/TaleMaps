@@ -1,12 +1,24 @@
 <template>
   <div>
-    <h2 id="zoneTitle">Zone Image Generator (Progress: {{renderIndex}} of {{$store.state.logs.logData.length}} frames)</h2>
+    <h2 id="zoneTitle">Zone Image Generator (Progress: {{renderIndex + 1}} of {{$store.state.logs.logData.length}} frames)</h2>
     <div id="canvasContainer">
       <canvas id="zoneCanvas" width="1002" height="668"></canvas>
       <div id="controlContainer">
-        <button id="stopButton" v-on:click="pause = true">Pause</button>
-        <button id="playButton" v-on:click="renderLoop()">Play</button>
-        <button id="abortButton" v-on:click="abortRendering()">Abort</button>
+        <div id="buttonContainer">
+          <button id="stopButton" v-on:click="pause = true">Pause</button>
+          <button id="playButton" v-on:click="renderLoop()">Play</button>
+          <button id="abortButton" v-on:click="abortRendering()">Abort</button>
+        </div>
+        <div v-if="(renderIndex + 1) === $store.state.logs.logData.length" id=zoneContainer>
+          <h4>Download Zone Images</h4>
+          <a 
+            id="download" 
+            href=""
+            v-bind:download="key + '.jpg'"
+            v-bind:key="key"
+            @click="download_img($event, key);"
+            v-for="(value, key) in tempMaps">{{ key }} </a>
+        </div>
       </div>
     </div>
   </div>
@@ -114,6 +126,10 @@ export default {
       this.renderIndex = 0
       this.$store.state.zoneMode = null
       this.$router.push("/");
+    },
+    download_img(el, key) {
+      var image = this.tempMaps[key]
+      el.target.href = image;
     }
   }
 }
@@ -123,6 +139,10 @@ export default {
 #canvasContainer {
   display: flex;
   flex-direction: row;
+}
+#zoneContainer {
+  display: flex;
+  flex-direction: column;
 }
 
 #zoneCanvas {
