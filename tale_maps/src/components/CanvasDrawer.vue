@@ -144,7 +144,7 @@ export default {
     abortRendering() {
       this.pause = true
       this.tempMaps = {}
-      this.prevPoint = []
+      this.prevPoint = {}
       this.renderIndex = 0
       this.$store.state.zoneMode = null
       this.$router.push("/");
