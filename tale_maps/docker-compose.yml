@@ -1,0 +1,6 @@
+web: 
+  
+  image: kahevajo/talemaps
+
+  environment:
+    - VIRTUAL_HOST=talemaps.khvj.se
